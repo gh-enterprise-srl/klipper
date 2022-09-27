@@ -26267,6 +26267,13 @@ typedef struct
 /* Aliases for COMP __IRQHandler */
 #define COMP_IRQHandler                COMP1_IRQHandler
 
+
+#define REV_ID_Y ((uint32_t)0x1003)  /*!< STM32H7 rev.Y */
+static inline uint32_t HAL_GetREVID(void)
+{
+   return((DBGMCU->IDCODE) >> 16);
+}
+
 /**
   * @}
   */

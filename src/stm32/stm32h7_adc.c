@@ -95,7 +95,6 @@ static const uint8_t adc_pins[] = {
     0,             //             VREFINT
 };
 
-
 // ADC timing:
 // ADC clock=30Mhz, Tconv=6.5, Tsamp=64.5, total=2.3666us*OVERSAMPLES
 
@@ -112,8 +111,16 @@ gpio_adc_setup(uint32_t pin)
     }
 
     // Determine which ADC block to use, enable peripheral clock
-    // (SYSCLK 480Mhz) /HPRE(2) /CKMODE divider(4) /additional divider(2)
-    // (ADC clock 30Mhz)
+    
+    
+    // H743 REV V
+    // (SYSCLK 400Mhz) /HPRE(2) /CKMODE divider(4) /additional divider(2)
+    // (ADC clock 25Mhz)
+    // H743 REV Y
+    // (SYSCLK 400Mhz) /HPRE(4) /CKMODE divider(4)
+    // (ADC clock 25Mhz)
+
+
     ADC_TypeDef *adc;
     if (chan >= 40){
         adc = ADC3;
@@ -140,12 +147,23 @@ gpio_adc_setup(uint32_t pin)
         // Pwr
         // Exit deep power down
         MODIFY_REG(adc->CR, ADC_CR_DEEPPWD_Msk, 0);
-        // Switch on voltage regulator
+
+         // Switch on voltage regulator
         adc->CR |= ADC_CR_ADVREGEN;
-        while(!(adc->ISR & ADC_ISR_LDORDY))
-            ;
-        // Set Boost mode for 25Mhz < ADC clock <= 50Mhz
-        MODIFY_REG(adc->CR, ADC_CR_BOOST_Msk, 0b11 << ADC_CR_BOOST_Pos);
+        if(HAL_GetREVID() > REV_ID_Y){
+            while (!(adc->ISR & ADC_ISR_LDORDY))
+                ;
+        }
+
+        if (HAL_GetREVID() > REV_ID_Y)
+        {
+            // Set Boost mode for 25Mhz < ADC clock <= 50Mhz
+            MODIFY_REG(adc->CR, ADC_CR_BOOST_Msk, 0b11 << ADC_CR_BOOST_Pos);
+        }
+        else
+        {
+            MODIFY_REG(adc->CR, 0x01 << ADC_CR_BOOST_Pos, 0b1 << ADC_CR_BOOST_Pos);
+        }
 
         // Calibration
         // Set calibration mode to Single ended (not differential)
@@ -180,7 +198,8 @@ gpio_adc_setup(uint32_t pin)
         // Disable Continuous Mode
         MODIFY_REG(adc->CFGR, ADC_CFGR_CONT_Msk, 0);
         // Set to 12 bit
-        MODIFY_REG(adc->CFGR, ADC_CFGR_RES_Msk, 0b110 << ADC_CFGR_RES_Pos);
+        //MODIFY_REG(adc->CFGR, ADC_CFGR_RES_Msk, 0b110 << ADC_CFGR_RES_Pos); // REV V
+        MODIFY_REG(adc->CFGR, ADC_CFGR_RES_Msk, 0b010 << ADC_CFGR_RES_Pos); // REV Y
         // Set hardware oversampling
         MODIFY_REG(adc->CFGR2, ADC_CFGR2_ROVSE_Msk, ADC_CFGR2_ROVSE);
         MODIFY_REG(adc->CFGR2, ADC_CFGR2_OVSR_Msk,
