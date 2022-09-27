@@ -270,14 +270,7 @@ armcm_main(void)
     RCC->D1CCIPR = 0x00000000;
     RCC->D2CCIP1R = 0x00000000;
     RCC->D2CCIP2R = 0x00000000;
-#if 1
     RCC->D3CCIPR = 0x00000000;
-#else
-    // Select source of adc clock as per_clk that is connected directly to HSI (64MHz)
-    MODIFY_REG(RCC->D3CCIPR, RCC_D3CCIPR_ADCSEL_Msk,
-        2 << RCC_D3CCIPR_ADCSEL_Pos);
-
-#endif
     SCB->VTOR = (uint32_t)VectorTable;
 
     check_usb_dfu_bootloader();
