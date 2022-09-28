@@ -11,6 +11,7 @@ OUTPUT_ARCH(arm)
 
 MEMORY
 {
+  DTCMRAM (xrw) : ORIGIN = 0x20000000, LENGTH = 128K
   rom (rx) : ORIGIN = CONFIG_FLASH_START , LENGTH = CONFIG_FLASH_SIZE
   ram (rwx) : ORIGIN = CONFIG_RAM_START , LENGTH = CONFIG_RAM_SIZE
 }
@@ -57,7 +58,7 @@ SECTIONS
         _bss_end = .;
     } > ram
 
-    _stack_start = CONFIG_RAM_START + CONFIG_RAM_SIZE - CONFIG_STACK_SIZE ;
+    _stack_start = ORIGIN(DTCMRAM) + LENGTH(DTCMRAM) - CONFIG_STACK_SIZE ;
     .stack _stack_start (NOLOAD) :
     {
         . = . + CONFIG_STACK_SIZE;
