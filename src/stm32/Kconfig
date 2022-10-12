@@ -180,6 +180,13 @@ config STACK_SIZE
     int
     default 512
 
+
+config RAISE3D_SPEEDY_BOARD
+    bool "Board for Raise Pro2 Printers"
+    depends on MACH_STM32H743
+    default y
+
+
 config STM32F103GD_DISABLE_SWD
     bool "Disable SWD at startup (for GigaDevice stm32f103 clones)"
     depends on MACH_STM32F103 && LOW_LEVEL_OPTIONS

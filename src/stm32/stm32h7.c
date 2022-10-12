@@ -227,6 +227,7 @@ clock_setup(void)
 #define USB_BOOT_FLAG_ADDR (CONFIG_RAM_START + CONFIG_RAM_SIZE - 1024)
 #define USB_BOOT_FLAG 0x55534220424f4f54 // "USB BOOT"
 
+#ifndef CONFIG_RAISE3D_SPEEDY_BOARD
 // Flag that bootloader is desired and reboot
 static void
 usb_reboot_for_dfu_bootloader(void)
@@ -235,12 +236,12 @@ usb_reboot_for_dfu_bootloader(void)
     *(uint64_t*)USB_BOOT_FLAG_ADDR = USB_BOOT_FLAG;
     NVIC_SystemReset();
 }
-
+#endif
 // Check if rebooting into system DFU Bootloader
 static void
 check_usb_dfu_bootloader(void)
 {
-    if (!CONFIG_USB || *(uint64_t*)USB_BOOT_FLAG_ADDR != USB_BOOT_FLAG)
+    if (!CONFIG_USB || *(uint64_t*)USB_BOOT_FLAG_ADDR != USB_BOOT_FLAG || CONFIG_RAISE3D_SPEEDY_BOARD)
         return;
     *(uint64_t*)USB_BOOT_FLAG_ADDR = 0;
     uint32_t *sysbase = (uint32_t*)0x1FF09800;
@@ -253,7 +254,10 @@ void
 bootloader_request(void)
 {
     try_request_canboot();
+#ifndef CONFIG_RAISE3D_SPEEDY_BOARD
     usb_reboot_for_dfu_bootloader();
+#endif
+
 }
 
 
