@@ -5,7 +5,7 @@
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
 import sys, optparse, os, re, logging
-import util, reactor, serialhdl, pins, msgproto, clocksync
+import util, reactor, serialhdl, pins, msgproto, clocksync,time
 
 help_txt = """
   This is a debugging console for the Klipper micro-controller.
@@ -53,6 +53,7 @@ class KeyboardReader:
             "DELAY": self.command_DELAY, "FLOOD": self.command_FLOOD,
             "SUPPRESS": self.command_SUPPRESS, "STATS": self.command_STATS,
             "LIST": self.command_LIST, "HELP": self.command_HELP,
+            "FWUPDATE": self.command_FWUPDATE,
         }
         self.eval_globals = {}
     def connect(self, eventtime):
@@ -100,6 +101,15 @@ class KeyboardReader:
         except ValueError:
             pass
         self.eval_globals[parts[1]] = val
+    def command_FWUPDATE(self, parts):
+        self.output("Starting firmware update..")
+        fw = open("/vmshare/FW_RAISE3D_Pro2_V9.9.9.kli", 'r')
+        lines = fw.readlines()
+        self.output("Programming Device ...")
+        for line in lines:
+            self.ser.send_with_response(line, "fw_update_response")
+        self.output("Firmware updated.")
+
     def command_DUMP(self, parts, filename=None):
         # Extract command args
         try:

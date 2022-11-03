@@ -11,6 +11,8 @@ dirs-$(CONFIG_MACH_STM32F4) += lib/stm32f4
 dirs-$(CONFIG_MACH_STM32G0) += lib/stm32g0
 dirs-$(CONFIG_MACH_STM32H7) += lib/stm32h7
 
+dirs-$(CONFIG_RAISE3D_SPEEDY_BOARD) += stm32/fwupdate
+
 MCU := $(shell echo $(CONFIG_MCU))
 MCU_UPPER := $(shell echo $(CONFIG_MCU) | tr a-z A-Z | tr X x)
 
@@ -66,6 +68,15 @@ src-$(CONFIG_CANSERIAL) += $(canbus-src-y) generic/canbus.c stm32/chipid.c
 src-$(CONFIG_USBCANBUS) += $(usb-src-y) $(canbus-src-y)
 src-$(CONFIG_USBCANBUS) += stm32/chipid.c generic/usb_canbus.c
 src-$(CONFIG_HAVE_GPIO_HARD_PWM) += stm32/hard_pwm.c
+
+src-$(CONFIG_RAISE3D_SPEEDY_BOARD) += stm32/fwupdate/fwUpdateCommon.c
+src-$(CONFIG_RAISE3D_SPEEDY_BOARD) += stm32/fwupdate/fwUpdateGCodeApi.c
+src-$(CONFIG_RAISE3D_SPEEDY_BOARD) += stm32/fwupdate/crc.c
+src-$(CONFIG_RAISE3D_SPEEDY_BOARD) += stm32/fwupdate/aes.c
+src-$(CONFIG_RAISE3D_SPEEDY_BOARD) += stm32/fwupdate/stm32h7xx_hal_crc.c
+src-$(CONFIG_RAISE3D_SPEEDY_BOARD) += stm32/fwupdate/stm32h7xx_hal_crc_ex.c
+src-$(CONFIG_RAISE3D_SPEEDY_BOARD) += stm32/fwupdate/stm32h7xx_hal_flash.c
+src-$(CONFIG_RAISE3D_SPEEDY_BOARD) += stm32/fwupdate/stm32h7xx_hal_flash_ex.c
 
 # Binary output file rules
 target-y += $(OUT)klipper.bin

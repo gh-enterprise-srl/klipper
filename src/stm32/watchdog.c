@@ -7,7 +7,7 @@
 #include "autoconf.h" // CONFIG_MACH_STM32H7
 #include "internal.h" // IWDG
 #include "sched.h" // DECL_TASK
-
+#include "fwupdate/fwUpdateGCodeApi.h"
 #if CONFIG_MACH_STM32H7 // stm32h7 libraries only define IWDG1 and IWDG2
 #define IWDG IWDG1
 #endif
@@ -15,7 +15,10 @@
 void
 watchdog_reset(void)
 {
-    IWDG->KR = 0xAAAA;
+    // if not reboot requested after firmware update 
+    if(!M997.systemResetEnabled){
+        IWDG->KR = 0xAAAA;
+    }
 }
 DECL_TASK(watchdog_reset);
 
