@@ -68,6 +68,7 @@ class FWUpdater:
         for line in lines:
             self.ser.send_with_response(line, "fw_update_response")
         self.output("FW_UPDATED")
+        exit(0)
 
     def translate(self, line, eventtime):
         evalparts = re_eval.split(line)
