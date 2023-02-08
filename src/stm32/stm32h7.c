@@ -156,8 +156,7 @@ clock_setup(void)
     }
 
     // Set flash latency according to clock frequency (pg.159)
-    uint32_t flash_acr_latency = (CONFIG_CLOCK_FREQ > 450000000) ?
-        FLASH_ACR_LATENCY_4WS : FLASH_ACR_LATENCY_2WS;
+    uint32_t flash_acr_latency = FLASH_ACR_LATENCY_4WS;
     MODIFY_REG(FLASH->ACR, FLASH_ACR_LATENCY_Msk, flash_acr_latency);
     MODIFY_REG(FLASH->ACR, FLASH_ACR_WRHIGHFREQ_Msk, FLASH_ACR_WRHIGHFREQ_1);
     while (!(FLASH->ACR & flash_acr_latency))
