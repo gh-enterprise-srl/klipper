@@ -5,7 +5,7 @@
  *      Author: andreac
  */
 #include "fwUpdateCommon.h"
-
+#include "command.h"
 uint32_t IAP_GetSector(uint32_t Address) {
 
 	uint32_t sector = 0;
@@ -78,9 +78,9 @@ bool IAP_EraseSector(uint8_t sector, uint8_t bank) {
 	HAL_FLASHEx_Lock_Bank2();
 	return true;
 }
+uint32_t timer_read_time(void);
 
-
-bool IAP_MassEraseBank2() {
+bool IAP_MassEraseBank2(void) {
 
 	FLASH_EraseInitTypeDef EraseInitStruct;
 	uint32_t SectorError = 0;
@@ -92,12 +92,18 @@ bool IAP_MassEraseBank2() {
 
 //	HAL_FLASH_Unlock();
 	__disable_irq();
+	sendf("FE_UNLOCK clock=%u", timer_read_time());
 	HAL_FLASHEx_Unlock_Bank2();
-	if (HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError) != HAL_OK) {
+	sendf("FE_START clock=%u", timer_read_time());
+	HAL_StatusTypeDef ret = HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError);
+	if (ret != HAL_OK) {
+		sendf("FE_ERROR clock=%u", timer_read_time());
 		return false;
 	}
 	__enable_irq();
+	sendf("FE_OK clock=%u", timer_read_time());
 	HAL_FLASHEx_Lock_Bank2();
+	sendf("FE_LOCK clock=%u", timer_read_time());
 	return true;
 }
 
