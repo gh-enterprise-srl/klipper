@@ -79,8 +79,8 @@ bool IAP_EraseSector(uint8_t sector, uint8_t bank) {
 	return true;
 }
 
-
-bool IAP_MassEraseBank2() {
+extern uint8_t enable_late_dispatch_control;
+bool IAP_MassEraseBank2(void) {
 
 	FLASH_EraseInitTypeDef EraseInitStruct;
 	uint32_t SectorError = 0;
@@ -89,8 +89,9 @@ bool IAP_MassEraseBank2() {
 	EraseInitStruct.TypeErase = FLASH_TYPEERASE_MASSERASE;
 	EraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
 	EraseInitStruct.Banks = FLASH_BANK_2;
+	
+	enable_late_dispatch_control = 0;
 
-//	HAL_FLASH_Unlock();
 	__disable_irq();
 	HAL_FLASHEx_Unlock_Bank2();
 	if (HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError) != HAL_OK) {

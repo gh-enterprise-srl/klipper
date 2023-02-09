@@ -90,6 +90,7 @@ timer_reset(void)
 }
 DECL_SHUTDOWN(timer_reset);
 
+
 void
 timer_init(void)
 {
@@ -118,6 +119,8 @@ static uint32_t timer_repeat_until;
 #define TIMER_MIN_TRY_TICKS timer_from_us(2)
 #define TIMER_DEFER_REPEAT_TICKS timer_from_us(5)
 
+uint8_t enable_late_dispatch_control = 1;
+
 // Invoke timers
 static uint32_t
 timer_dispatch_many(void)
@@ -135,7 +138,7 @@ timer_dispatch_many(void)
 
         if (unlikely(timer_is_before(tru, now))) {
             // Check if there are too many repeat timers
-            if (diff < (int32_t)(-timer_from_us(1000)))
+            if ((diff < (int32_t)(-timer_from_us(1000))) && likely(enable_late_dispatch_control))
                 try_shutdown("Rescheduled timer in the past");
             if (sched_tasks_busy()) {
                 timer_repeat_until = now + TIMER_REPEAT_TICKS;
